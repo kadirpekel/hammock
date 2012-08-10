@@ -7,5 +7,8 @@ setup(
     description = 'rest like a boss',
     author='Kadir Pekel',
     author_email='kadirpekel@gmail.com',
-    url='https://github.com/kadirpekel/hammock'
+    url='https://github.com/kadirpekel/hammock',
+    install_requires=[
+        'wrest>=0.1.0'
+    ],
 )
