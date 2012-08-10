@@ -16,6 +16,15 @@ Let's play with github::
     for follower in followers:
         print follower.get('login')
 
+Not convinced? This is how you watch this project to see its future capabilities::
+
+    from hammock import Hammock
+    
+    github = Hammock('https://api.github.com', client_ops={'username': '<uname>', 'password': '<pass>'})
+    resp, info = github.user.watched('kadirpekel').PUT('hammock', headers={'content-length': 0})
+    
+    print(info.get('status'))
+
 Docs
 ----
 

@@ -9,4 +9,3 @@ setup(
     author_email='kadirpekel@gmail.com',
     url='https://github.com/kadirpekel/hammock'
 )
-
