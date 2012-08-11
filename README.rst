@@ -10,7 +10,7 @@ Let's play with github::
     from hammock import Hammock as Github
 
     # This generates a url such as 'https://api.github.com/users/kadirpekel/followers' and requests it via http GET
-    followers, info = Github('https://api.github.com').users('kadirpekel').followers.GET()
+    followers = Github('https://api.github.com').users('kadirpekel').followers.GET().as_json()
 
     # now you're ready to take a rest for the rest the of code :)
     for follower in followers:
@@ -21,9 +21,9 @@ Not convinced? This is how you watch this project to see its future capabilities
     from hammock import Hammock
 
     github = Hammock('https://api.github.com', client_ops={'username': '<uname>', 'password': '<pass>'})
-    resp, info = github.user.watched('kadirpekel').PUT('hammock', headers={'content-length': 0})
+    resp = github.user.watched('kadirpekel').PUT('hammock')
 
-    print(info.get('status'))
+    print(resp)
 
 Docs
 ----
