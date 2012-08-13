@@ -1,8 +1,10 @@
-from wrest import Client
+import requests
 
 class Hammock(object):
 
-    def __init__(self, name=None, parent=None, client_ops=dict()):
+    HTTP_METHODS = ['get', 'options', 'head', 'post', 'put', 'patch', 'delete']
+
+    def __init__(self, name=None, parent=None):
         """Constructor
 
         Arguments:
@@ -14,18 +16,15 @@ class Hammock(object):
         self._parent = parent
 
         if not self._parent:
-            client = Client(client_ops.get('base_url', name), **client_ops)
-
             def bind_method(method):
-                def f(self2, *args, **kwargs):
-                    args = [mock._name for mock in self2._chain(*args)]
-                    args.reverse()
-                    kwargs['method'] = method
-                    return client.rest(*args, **kwargs)
+                def f(hammock, *args, **kwargs):
+                    path_comps = [mock._name for mock in hammock._chain(*args)] 
+                    url = "/".join(reversed(path_comps))
+                    return requests.request(method, url, **kwargs)
                 return f
 
-            for method in Client.HTTP_METHODS:
-                setattr(Hammock, method, bind_method(method))
+            for method in Hammock.HTTP_METHODS:
+                setattr(Hammock, method.upper(), bind_method(method))
 
     def __getattr__(self, name):
         """ Here comes some magic. Any absent attribute typed within class falls
@@ -37,7 +36,7 @@ class Hammock(object):
         """ Iterator implementation which iterates over `Hammock` chain."""
         current = self
         while current:
-            if current._name and current._parent:
+            if current._name:
                 yield current
             current = current._parent
 

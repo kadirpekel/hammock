@@ -9,6 +9,6 @@ setup(
     author_email='kadirpekel@gmail.com',
     url='https://github.com/kadirpekel/hammock',
     install_requires=[
-        'wrest>=0.1.3'
+        'requests>=0.13.6'
     ],
 )

@@ -7,23 +7,30 @@ How?
 ----
 Let's play with github::
 
-    from hammock import Hammock as Github
+    >>> from hammock import Hammock as Github
 
-    # This generates a url such as 'https://api.github.com/users/kadirpekel/followers' and requests it via http GET
-    followers = Github('https://api.github.com').users('kadirpekel').followers.GET().as_json()
+    >>> resp = Github('https://api.github.com').repos('kadirpekel', 'hammock').watchers.GET()
 
-    # now you're ready to take a rest for the rest the of code :)
-    for follower in followers:
-        print follower.get('login')
+    >>> # This generates a url such as below and requests it via http GET
+    >>> print(resp.url)
+    https://api.github.com/repos/kadirpekel/hammock/watchers
+
+    >>> # now you're ready to take a rest for the rest the of code :)
+    >>> for watcher in resp.json: print watcher.get('login')
+    kadirpekel
+    ...
+    ..
+    .
 
 Not convinced? This is how you watch this project to see its future capabilities::
 
-    from hammock import Hammock
+    >>> from hammock import Hammock as Github
 
-    github = Hammock('https://api.github.com', client_ops={'username': '<uname>', 'password': '<pass>'})
-    resp = github.user.watched('kadirpekel').PUT('hammock')
+    >>> resp = Github('https://api.github.com').user.watched('kadirpekel').PUT('hammock',
+                                    auth=('<user>', '<pass>'), headers={'content-length': '0'})
 
-    print(resp)
+    >>> print(resp)
+    <Response [204]>
 
 Docs
 ----
