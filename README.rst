@@ -1,10 +1,12 @@
 Hammock!
 ========
 
-Hammock lets you deal with rest APIs by converting them into dead simple programmatic APIs.
+Hammock is a fun module lets you deal with rest APIs by converting them into dead simple programmatic APIs.
+It uses popular `requests` module in backyard to provide full-fledged rest experience.
 
-How?
-----
+Proof
+-----
+
 Let's play with github::
 
     >>> from hammock import Hammock as Github
@@ -32,10 +34,47 @@ Not convinced? This is how you watch this project to see its future capabilities
     >>> print(resp)
     <Response [204]>
 
-Docs
-----
+Install
+-------
 
-soon.
+The best way to install Hammock is using pypi repositories via `easy_install` or `pip`::
+
+    $ pip install hammock
+
+Documentation
+-------------
+
+Hammock is a magical, polymorphic(!), fun and simple class which helps you generate RESTful urls
+and lets you send requests to them using `requests` module in an easy and slick way.
+
+Below the phrases all generates the same urls. Note that some of them are nonsense in this context::
+
+    >>> import hammock
+
+    >>> hammock.Hammock('http://localhost:8000').users('foo').posts('bar').comments.GET().url
+    http://localhost:8000/users/foo/posts/bar/comments
+
+    >>> hammock.Hammock('http://localhost:8000').users.foo.posts('bar').GET('comments').url
+    http://localhost:8000/users/foo/posts/bar/comments
+
+    >>> hammock.Hammock('http://localhost:8000').users.foo.posts.bar.comments.GET().url
+    http://localhost:8000/users/foo/posts/bar/comments
+
+    >>> hammock.Hammock('http://localhost:8000').users('foo', 'posts', 'comments').GET().url
+    http://localhost:8000/users/foo/posts/bar/comments
+
+    >>> hammock.Hammock('http://localhost:8000')('users')('foo', 'posts').GET('bar', 'comments').url
+    http://localhost:8000/users/foo/posts/bar/comments
+
+    >>> # Any other combinations ...
+
+Hammock class instance provides `requests` module's all http methods binded on itself as uppercased version
+while dropping the first arg 'url'. But you can continue providing any keyword argument for corresponding
+http verb method of `requests` module::
+
+    Hammock.[GET, HEAD, OPTIONS, POST, PUT, PATCH, DELETE](**kwargs)
+
+Return type is the same `Request` object `requests` module provides.
 
 Licence
 -------
