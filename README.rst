@@ -69,12 +69,13 @@ Below the phrases all generates the same urls. Note that some of them are nonsen
     >>> # Any other combinations ...
 
 Hammock class instance provides `requests` module's all http methods binded on itself as uppercased version
-while dropping the first arg 'url'. But you can continue providing any keyword argument for corresponding
-http verb method of `requests` module::
+while dropping the first arg 'url' in replacement of `*args` to let you to continue appending url components.
 
-    Hammock.[GET, HEAD, OPTIONS, POST, PUT, PATCH, DELETE](**kwargs)
+Also you can continue providing any keyword argument for corresponding http verb method of `requests` module::
 
-Return type is the same `Request` object `requests` module provides.
+    Hammock.[GET, HEAD, OPTIONS, POST, PUT, PATCH, DELETE](*args, **kwargs)
+
+Return type is the same `Response` object `requests` module provides.
 
 Licence
 -------
