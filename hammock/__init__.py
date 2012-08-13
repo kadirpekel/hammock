@@ -15,17 +15,6 @@ class Hammock(object):
         self._name = name
         self._parent = parent
 
-        if not self._parent:
-            def bind_method(method):
-                def f(hammock, *args, **kwargs):
-                    path_comps = [mock._name for mock in hammock._chain(*args)] 
-                    url = "/".join(reversed(path_comps))
-                    return requests.request(method, url, **kwargs)
-                return f
-
-            for method in Hammock.HTTP_METHODS:
-                setattr(Hammock, method.upper(), bind_method(method))
-
     def __getattr__(self, name):
         """ Here comes some magic. Any absent attribute typed within class falls
         here and return a new child `Hammock` instance in the chain.
@@ -56,3 +45,14 @@ class Hammock(object):
         a new child `Hammock` instance in the chain
         """
         return self._chain(*args)
+
+# Bind `requests` module HTTP verb methods
+def bind_method(method):
+    def f(hammock, *args, **kwargs):
+        path_comps = [mock._name for mock in hammock._chain(*args)] 
+        url = "/".join(reversed(path_comps))
+        return requests.request(method, url, **kwargs)
+    return f
+
+for method in Hammock.HTTP_METHODS:
+    setattr(Hammock, method.upper(), bind_method(method))
