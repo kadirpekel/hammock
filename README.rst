@@ -45,9 +45,9 @@ Documentation
 -------------
 
 Hammock is a magical, polymorphic(!), fun and simple class which helps you generate RESTful urls
-and lets you send requests to them using `requests` module in an easy and slick way.
+and lets you request them using `requests` module in an easy and slick way.
 
-Below the phrases all generates the same urls. Note that some of them are nonsense in this context::
+Below the phrases all generate the same url. Note that some of them are nonsense in this context::
 
     >>> import hammock
 
@@ -76,6 +76,14 @@ Also you can continue providing any keyword argument for corresponding http verb
     Hammock.[GET, HEAD, OPTIONS, POST, PUT, PATCH, DELETE](*args, **kwargs)
 
 Return type is the same `Response` object `requests` module provides.
+
+Here is some more real world applicable example which uses twitter api::
+
+    >>> import hammock
+    >>> twitter = hammock.Hammock('https://api.twitter.com/1')
+    >>> tweets = twitter.statuses('user_timeline.json').GET(params={'screen_name':'kadirpekel', 'count':'10'}).json
+    >>> for tweet in tweets: print tweet.get('text')
+
 
 Licence
 -------
