@@ -11,9 +11,9 @@ Let's play with github::
 
     >>> from hammock import Hammock as Github
 
+    >>> # This generates a url such as below and requests it via http GET
     >>> resp = Github('https://api.github.com').repos('kadirpekel', 'hammock').watchers.GET()
 
-    >>> # This generates a url such as below and requests it via http GET
     >>> print(resp.url)
     https://api.github.com/repos/kadirpekel/hammock/watchers
 
