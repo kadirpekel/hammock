@@ -47,24 +47,21 @@ Documentation
 Hammock is a magical, polymorphic(!), fun and simple class which helps you generate RESTful urls
 and lets you request them using `requests` module in an easy and slick way.
 
-Below the phrases all generate the same url. Note that some of them are nonsense in this context::
+Below the all phrases generate the same url of 'http://localhost:8000/users/foo/posts/bar/comments'.
+Note that some of them are nonsense in this context::
 
     >>> import hammock
+    >>> api = hammock.Hammock('http://localhost:8000')
 
-    >>> hammock.Hammock('http://localhost:8000').users('foo').posts('bar').comments.GET().url
-    http://localhost:8000/users/foo/posts/bar/comments
+    >>> api.users('foo').posts('bar').comments.GET().url
 
-    >>> hammock.Hammock('http://localhost:8000').users.foo.posts('bar').GET('comments').url
-    http://localhost:8000/users/foo/posts/bar/comments
+    >>> api.users.foo.posts('bar').GET('comments').url
 
-    >>> hammock.Hammock('http://localhost:8000').users.foo.posts.bar.comments.GET().url
-    http://localhost:8000/users/foo/posts/bar/comments
+    >>> api.users.foo.posts.bar.comments.GET().url
 
-    >>> hammock.Hammock('http://localhost:8000').users('foo', 'posts', 'comments').GET().url
-    http://localhost:8000/users/foo/posts/bar/comments
+    >>> api.users('foo', 'posts', 'comments').GET().url
 
-    >>> hammock.Hammock('http://localhost:8000')('users')('foo', 'posts').GET('bar', 'comments').url
-    http://localhost:8000/users/foo/posts/bar/comments
+    >>> api('users')('foo', 'posts').GET('bar', 'comments').url
 
     >>> # Any other combinations ...
 
