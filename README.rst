@@ -47,22 +47,22 @@ Documentation
 Hammock is a magical, polymorphic(!), fun and simple class which helps you generate RESTful urls
 and lets you request them using `requests` module in an easy and slick way.
 
-Below the all phrases generate the same url of 'http://localhost:8000/users/foo/posts/bar/comments'.
-Note that some of them are nonsense in this context::
+Below the all phrases make request to the same url of 'http://localhost:8000/users/foo/posts/bar/comments'.
+Note that all of them are valid but some of them are nonsense in their belonging context::
 
     >>> import hammock
     >>> api = hammock.Hammock('http://localhost:8000')
-
-    >>> api.users('foo').posts('bar').comments.GET().url
-
-    >>> api.users.foo.posts('bar').GET('comments').url
-
-    >>> api.users.foo.posts.bar.comments.GET().url
-
-    >>> api.users('foo', 'posts', 'comments').GET().url
-
-    >>> api('users')('foo', 'posts').GET('bar', 'comments').url
-
+    <Response [200]>
+    >>> api.users('foo').posts('bar').comments.GET()
+    <Response [200]>
+    >>> api.users.foo.posts('bar').GET('comments')
+    <Response [200]>
+    >>> api.users.foo.posts.bar.comments.GET()
+    <Response [200]>
+    >>> api.users('foo', 'posts', 'comments').GET()
+    <Response [200]>
+    >>> api('users')('foo', 'posts').GET('bar', 'comments')
+    <Response [200]>
     >>> # Any other combinations ...
 
 Hammock class instance provides `requests` module's all http methods binded on itself as uppercased version
@@ -80,6 +80,10 @@ Here is some more real world applicable example which uses twitter api::
     >>> twitter = hammock.Hammock('https://api.twitter.com/1')
     >>> tweets = twitter.statuses('user_timeline.json').GET(params={'screen_name':'kadirpekel', 'count':'10'}).json
     >>> for tweet in tweets: print tweet.get('text')
+    my tweets
+    ...
+    ..
+    .
 
 
 Licence
