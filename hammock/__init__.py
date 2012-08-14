@@ -4,7 +4,7 @@ class Hammock(object):
 
     HTTP_METHODS = ['get', 'options', 'head', 'post', 'put', 'patch', 'delete']
 
-    def __init__(self, name=None, parent=None):
+    def __init__(self, name=None, parent=None, session=None):
         """Constructor
 
         Arguments:
@@ -14,6 +14,7 @@ class Hammock(object):
         """
         self._name = name
         self._parent = parent
+        self._session = session
 
     def __getattr__(self, name):
         """ Here comes some magic. Any absent attribute typed within class falls
@@ -40,6 +41,12 @@ class Hammock(object):
             chain = Hammock(name=str(arg), parent=chain)
         return chain
 
+    def _probe_session(self):
+        for hammock in self:
+            if hammock._session:
+                return hammock._session
+        return None
+
     def __call__(self, *args):
         """ Here comes second magic. If any `Hammock` instance called it returns
         a new child `Hammock` instance in the chain
@@ -51,7 +58,8 @@ def bind_method(method):
     def f(hammock, *args, **kwargs):
         path_comps = [mock._name for mock in hammock._chain(*args)] 
         url = "/".join(reversed(path_comps))
-        return requests.request(method, url, **kwargs)
+        session = hammock._probe_session() or requests
+        return session.request(method, url, **kwargs)
     return f
 
 for method in Hammock.HTTP_METHODS:

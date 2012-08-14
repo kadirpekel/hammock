@@ -52,7 +52,6 @@ Note that all of them are valid but some of them are nonsense in their belonging
 
     >>> import hammock
     >>> api = hammock.Hammock('http://localhost:8000')
-    <Response [200]>
     >>> api.users('foo').posts('bar').comments.GET()
     <Response [200]>
     >>> api.users.foo.posts('bar').GET('comments')
@@ -85,6 +84,28 @@ Here is some more real world applicable example which uses twitter api::
     ..
     .
 
+You might also want to use sessions. Let's take a look at the JIRA example below which maintains basic
+auth credentials through several http requests::
+
+    >>> import hammock
+    >>> import requests
+
+    >>> # You can configure a session to provide auth credentials through several requests
+    >>> jira = hammock.Hammock('https://jira.atlassian.com/rest/api/latest',
+                                    session=requests.session(auth=('<user>', '<pass>')))
+
+    >>> my_issue = 'JRA-9'
+
+    >>> # Let's get a jira issue. No auth credentials provided explicitly since parent
+    >>> # hammock already has a `requests` session configured.
+    >>> issue = jira.issue(my_issue).GET()
+
+    >>> # Now watch the issue again using with the same session
+    >>> watched = jira.issue(my_issue).watchers.POST(params={'name': '<user>'})
+
+    >>> print(watched)
+
+More detailed, concrete documentation coming soon...
 
 Licence
 -------
