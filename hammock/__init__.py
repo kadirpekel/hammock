@@ -1,6 +1,7 @@
 import requests
 
 class Hammock(object):
+    """Chainable, magical class helps you make requests to RESTful services"""
 
     HTTP_METHODS = ['get', 'options', 'head', 'post', 'put', 'patch', 'delete']
 
@@ -8,9 +9,9 @@ class Hammock(object):
         """Constructor
 
         Arguments:
-            name -- name of node. If this node is root, used as client base_url
+            name -- name of node
             parent -- parent node for chaining
-            client_ops -- `wrest` client constructor options
+            session -- `requests` session instance
         """
         self._name = name
         self._parent = parent
@@ -34,7 +35,7 @@ class Hammock(object):
         """ This method converts args into chained Hammock instances
 
         Arguments:
-            args -- array of string representable objects
+            *args -- array of string representable objects
         """
         chain = self
         for arg in args:
@@ -42,6 +43,9 @@ class Hammock(object):
         return chain
 
     def _probe_session(self):
+        """This method searches for a `requests` session sticked to any
+        ascending parent `Hammock` instance
+        """
         for hammock in self:
             if hammock._session:
                 return hammock._session
@@ -53,7 +57,7 @@ class Hammock(object):
         """
         return self._chain(*args)
 
-# Bind `requests` module HTTP verb methods
+# Bind `requests` module HTTP verbs to `Hammock` class as static methods
 def bind_method(method):
     def f(hammock, *args, **kwargs):
         path_comps = [mock._name for mock in hammock._chain(*args)] 
