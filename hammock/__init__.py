@@ -1,5 +1,6 @@
 import requests
 
+
 class Hammock(object):
     """Chainable, magical class helps you make requests to RESTful services"""
 
@@ -18,13 +19,13 @@ class Hammock(object):
         self._session = kwargs and requests.session(**kwargs) or None
 
     def __getattr__(self, name):
-        """ Here comes some magic. Any absent attribute typed within class falls
-        here and return a new child `Hammock` instance in the chain.
+        """Here comes some magic. Any absent attribute typed within class
+        falls here and return a new child `Hammock` instance in the chain.
         """
         return Hammock(name=name, parent=self)
 
     def __iter__(self):
-        """ Iterator implementation which iterates over `Hammock` chain."""
+        """Iterator implementation which iterates over `Hammock` chain."""
         current = self
         while current:
             if current._name:
@@ -52,40 +53,43 @@ class Hammock(object):
         return None
 
     def _close_session(self, probe=False):
-        """ Closes session if exists
+        """Closes session if exists
 
         Arguments:
-            probe -- search through ascendants if any session available to close
+            probe -- search through ascendants if any session available
+                to close
         """
         session = probe and self._probe_session() or self._session
         if session:
             session.close()
 
     def __call__(self, *args):
-        """ Here comes second magic. If any `Hammock` instance called it returns
-        a new child `Hammock` instance in the chain
+        """Here comes second magic. If any `Hammock` instance called it
+        returns a new child `Hammock` instance in the chain
         """
         return self._chain(*args)
 
     def _url(self, *args):
-        """ Converts current `Hammock` chain into a url string
+        """Converts current `Hammock` chain into a url string
 
         Arguments:
             *args -- extra url path components to tail
         """
-        path_comps = [mock._name for mock in self._chain(*args)] 
+        path_comps = [mock._name for mock in self._chain(*args)]
         return "/".join(reversed(path_comps))
 
     def __repr__(self):
         """ String representaion of current `Hammock` chain"""
         return self._url()
 
-# Bind `requests` module HTTP verbs to `Hammock` class as static methods
+
 def bind_method(method):
-    def f(hammock, *args, **kwargs):
+    """Bind `requests` module HTTP verbs to `Hammock` class as
+    static methods."""
+    def aux(hammock, *args, **kwargs):
         session = hammock._probe_session() or requests
         return session.request(method, hammock._url(*args), **kwargs)
-    return f
+    return aux
 
 for method in Hammock.HTTP_METHODS:
     setattr(Hammock, method.upper(), bind_method(method))
