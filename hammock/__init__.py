@@ -58,8 +58,8 @@ class Hammock(object):
             probe -- search through ascendants if any session available to close
         """
         session = probe and self._probe_session() or self._session
-        if _session:
-            _session.close()
+        if session:
+            session.close()
 
     def __call__(self, *args):
         """ Here comes second magic. If any `Hammock` instance called it returns
