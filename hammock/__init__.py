@@ -33,7 +33,7 @@ class Hammock(object):
             current = current._parent
 
     def _chain(self, *args):
-        """ This method converts args into chained Hammock instances
+        """This method converts args into chained Hammock instances
 
         Arguments:
             *args -- array of string representable objects
