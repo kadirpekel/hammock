@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name = 'hammock',
     packages = ['hammock'],
-    version = '0.0.8',
+    version = '0.0.9',
     description = 'rest like a boss',
     author='Kadir Pekel',
     author_email='kadirpekel@gmail.com',

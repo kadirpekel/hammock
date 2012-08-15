@@ -88,11 +88,10 @@ You might also want to use sessions. Let's take a look at the JIRA example below
 auth credentials through several http requests::
 
     >>> import hammock
-    >>> import requests
 
-    >>> # You can configure a session to provide auth credentials through several requests
-    >>> jira = hammock.Hammock('https://jira.atlassian.com/rest/api/latest',
-                                    session=requests.session(auth=('<user>', '<pass>')))
+    >>> # You can configure a session by providing keyword args to `Hammock` constructor to initiate builtin `requests` session
+    >>> # This sample below shows the use of auth credentials through several requests by intitiating a embedded session
+    >>> jira = hammock.Hammock('https://jira.atlassian.com/rest/api/latest', auth=('<user>', '<pass>'))
 
     >>> my_issue = 'JRA-9'
 
