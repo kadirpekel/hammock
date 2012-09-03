@@ -82,14 +82,21 @@ class Hammock(object):
         """ String representaion of current `Hammock` chain"""
         return self._url()
 
+    def _request(self, method, *args, **kwargs):
+        """
+        Makes the HTTP request using requests module
+        """
+        session = self._probe_session() or requests
+        return session.request(method, self._url(*args), **kwargs)
+
 
 def bind_method(method):
     """Bind `requests` module HTTP verbs to `Hammock` class as
     static methods."""
     def aux(hammock, *args, **kwargs):
-        session = hammock._probe_session() or requests
-        return session.request(method, hammock._url(*args), **kwargs)
+        return hammock._request(method, *args, **kwargs)
     return aux
+
 
 for method in Hammock.HTTP_METHODS:
     setattr(Hammock, method.upper(), bind_method(method))
