@@ -1,21 +1,23 @@
 import requests
-
+import operator
 
 class Hammock(object):
     """Chainable, magical class helps you make requests to RESTful services"""
 
     HTTP_METHODS = ['get', 'options', 'head', 'post', 'put', 'patch', 'delete']
 
-    def __init__(self, name=None, parent=None, **kwargs):
+    def __init__(self, name=None, parent=None, append_slash=False, **kwargs):
         """Constructor
 
         Arguments:
             name -- name of node
             parent -- parent node for chaining
+            append_slash -- flag if you want a trailing slash in urls
             **kwargs -- `requests` session be initiated with if any available
         """
         self._name = name
         self._parent = parent
+        self._append_slash = append_slash
         self._session = kwargs and requests.session(**kwargs) or None
 
     def __getattr__(self, name):
@@ -52,6 +54,12 @@ class Hammock(object):
                 return hammock._session
         return None
 
+    def _probe_slash_option(self):
+        """This method searches for any flagged `_append_slash` option in
+        ascending `Hammock` instance
+        """
+        return reduce(operator.or_, [hammock._append_slash for hammock in self])
+
     def _close_session(self, probe=False):
         """Closes session if exists
 
@@ -76,16 +84,17 @@ class Hammock(object):
             *args -- extra url path components to tail
         """
         path_comps = [mock._name for mock in self._chain(*args)]
-        return "/".join(reversed(path_comps))
+        url = "/".join(reversed(path_comps))
+        if self._probe_slash_option():
+            url = url + "/"
+        return url 
 
     def __repr__(self):
-        """ String representaion of current `Hammock` chain"""
+        """String representaion of current `Hammock` chain"""
         return self._url()
 
     def _request(self, method, *args, **kwargs):
-        """
-        Makes the HTTP request using requests module
-        """
+        """Makes the HTTP request using requests module"""
         session = self._probe_session() or requests
         return session.request(method, self._url(*args), **kwargs)
 

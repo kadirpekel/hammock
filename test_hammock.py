@@ -69,6 +69,13 @@ class TestCaseWrest(unittest.TestCase):
             self.assertIsNotNone(resp.json.get('path', None))
             self.assertEqual(resp.json.get('path'), PATH)
 
+    def test_append_slash_option(self):
+        client = Hammock(BASE_URL, append_slash=True)
+        resp = client.sample.path.to.resource.GET()
+        self.assertIsNotNone(resp.json)
+        self.assertIsNotNone(resp.json.get('path', None))
+        self.assertEqual(resp.json.get('path'), PATH + "/")
+
     def test_body(self):
         client = Hammock(BASE_URL)
         body = "body fixture"
