@@ -69,6 +69,13 @@ class TestCaseWrest(unittest.TestCase):
             self.assertIsNotNone(resp.json.get('path', None))
             self.assertEqual(resp.json.get('path'), PATH)
 
+    def test_append_slash_option(self):
+        client = Hammock(BASE_URL, append_slash=True)
+        resp = client.sample.path.to.resource.GET()
+        self.assertIsNotNone(resp.json)
+        self.assertIsNotNone(resp.json.get('path', None))
+        self.assertEqual(resp.json.get('path'), PATH + "/")
+
     def test_body(self):
         client = Hammock(BASE_URL)
         body = "body fixture"
@@ -96,6 +103,26 @@ class TestCaseWrest(unittest.TestCase):
         self.assertIsNotNone(headers.get('HTTP_FOO', None))
         self.assertEqual(headers.get('HTTP_FOO'), 'bar')
 
+    def test_inheritance(self):
+        """https://github.com/kadirpekel/hammock/pull/5/files#L1R99"""
+        class CustomHammock(Hammock):
+            def __init__(self, name=None, parent=None, **kwargs):
+                if 'testing' in kwargs:
+                    self.testing = kwargs.pop('testing')
+                super(CustomHammock, self).__init__(name, parent, **kwargs)
+
+            def _url(self, *args):
+                assert isinstance(self.testing, bool)
+                global called
+                called = True
+                return super(CustomHammock, self)._url(*args)
+
+        global called
+        called = False
+        client = CustomHammock(BASE_URL, testing=True)
+        resp = client.sample.path.to.GET()
+        self.assertEqual(resp.json['path'], '/sample/path/to')
+        self.assertTrue(called)
 
 if __name__ == '__main__':
     unittest.main()
