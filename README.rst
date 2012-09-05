@@ -106,11 +106,11 @@ auth credentials through several http requests::
 
 More detailed, concrete documentation coming soon...
 
-Contributers
+Contributors
 ------------
 
- * @maraujop (Miguel Araujo)
- * @rubik (Michele Lacchia)
+* @maraujop (Miguel Araujo)
+* @rubik (Michele Lacchia)
 
 Licence
 -------
