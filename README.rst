@@ -106,6 +106,12 @@ auth credentials through several http requests::
 
 More detailed, concrete documentation coming soon...
 
+Contributers
+------------
+
+ * @maraujop (Miguel Araujo)
+ * @rubik (Michele Lacchia)
+
 Licence
 -------
 Copyright (c) 2012 Kadir Pekel.
