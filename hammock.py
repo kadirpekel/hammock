@@ -35,6 +35,7 @@ class Hammock(object):
         """Here comes some magic. Any absent attribute typed within class
         falls here and return a new child `Hammock` instance in the chain.
         """
+        # Ignore specials (Otherwise shallow copying causes infinite loops)
         if name.startswith('__'):
             raise AttributeError(name)
         return self._spawn(name)
