@@ -1,28 +1,43 @@
 import requests
-
+import copy
 
 class Hammock(object):
     """Chainable, magical class helps you make requests to RESTful services"""
 
     HTTP_METHODS = ['get', 'options', 'head', 'post', 'put', 'patch', 'delete']
 
-    def __init__(self, name=None, parent=None, **kwargs):
+    def __init__(self, name=None, parent=None, append_slash=False, **kwargs):
         """Constructor
 
         Arguments:
             name -- name of node
             parent -- parent node for chaining
+            append_slash -- flag if you want a trailing slash in urls
             **kwargs -- `requests` session be initiated with if any available
         """
         self._name = name
         self._parent = parent
-        self._session = kwargs and requests.session(**kwargs) or None
+        self._append_slash = append_slash
+        self._session = kwargs and requests.session(**kwargs) or requests
+
+    def _spawn(self, name):
+        """Returns a shallow copy of current `Hammock` instance as nested child
+        
+        Arguments:
+            name -- name of child
+        """
+        child = copy.copy(self)
+        child._name = name
+        child._parent = self
+        return child
 
     def __getattr__(self, name):
         """Here comes some magic. Any absent attribute typed within class
         falls here and return a new child `Hammock` instance in the chain.
         """
-        return Hammock(name=name, parent=self)
+        if name.startswith('__'):
+            raise AttributeError(name)
+        return self._spawn(name)
 
     def __iter__(self):
         """Iterator implementation which iterates over `Hammock` chain."""
@@ -40,28 +55,13 @@ class Hammock(object):
         """
         chain = self
         for arg in args:
-            chain = Hammock(name=str(arg), parent=chain)
+            chain = chain._spawn(str(arg))
         return chain
 
-    def _probe_session(self):
-        """This method searches for a `requests` session sticked to any
-        ascending parent `Hammock` instance
-        """
-        for hammock in self:
-            if hammock._session:
-                return hammock._session
-        return None
-
-    def _close_session(self, probe=False):
-        """Closes session if exists
-
-        Arguments:
-            probe -- search through ascendants if any session available
-                to close
-        """
-        session = probe and self._probe_session() or self._session
-        if session:
-            session.close()
+    def _close_session(self):
+        """Closes session if exists"""
+        if self._session:
+            self._session.close()
 
     def __call__(self, *args):
         """Here comes second magic. If any `Hammock` instance called it
@@ -76,7 +76,10 @@ class Hammock(object):
             *args -- extra url path components to tail
         """
         path_comps = [mock._name for mock in self._chain(*args)]
-        return "/".join(reversed(path_comps))
+        url = "/".join(reversed(path_comps))
+        if self._append_slash:
+            url = url + "/"
+        return url
 
     def __repr__(self):
         """ String representaion of current `Hammock` chain"""
@@ -86,8 +89,7 @@ class Hammock(object):
         """
         Makes the HTTP request using requests module
         """
-        session = self._probe_session() or requests
-        return session.request(method, self._url(*args), **kwargs)
+        return self._session.request(method, self._url(*args), **kwargs)
 
 
 def bind_method(method):
@@ -96,7 +98,6 @@ def bind_method(method):
     def aux(hammock, *args, **kwargs):
         return hammock._request(method, *args, **kwargs)
     return aux
-
 
 for method in Hammock.HTTP_METHODS:
     setattr(Hammock, method.upper(), bind_method(method))
