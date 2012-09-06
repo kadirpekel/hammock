@@ -1,6 +1,7 @@
 import requests
 import copy
 
+
 class Hammock(object):
     """Chainable, magical class helps you make requests to RESTful services"""
 
@@ -22,7 +23,7 @@ class Hammock(object):
 
     def _spawn(self, name):
         """Returns a shallow copy of current `Hammock` instance as nested child
-        
+
         Arguments:
             name -- name of child
         """

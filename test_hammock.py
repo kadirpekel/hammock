@@ -13,9 +13,11 @@ BASE_URL = "http://%s:%s" % (HOST, PORT)
 PATH = '/sample/path/to/resource'
 URL = BASE_URL + PATH
 
+
 def fixture_app(environ, start_response):
     content_length = int(environ.get('CONTENT_LENGTH', None) or '0')
-    headers = dict([(k, v) for k, v in environ.items() if k.find("HTTP_") == 0])
+    headers = dict([(k, v) for k, v in environ.items()
+                   if k.find("HTTP_") == 0])
     body = None
     if content_length:
         body = environ.get('wsgi.input').read(content_length)
@@ -26,8 +28,9 @@ def fixture_app(environ, start_response):
         'headers': headers,
         'querystring': environ.get('QUERY_STRING')
     }
-    start_response('200 OK', [('Content-type','application/json')])
+    start_response('200 OK', [('Content-type', 'application/json')])
     return json.dumps(response_obj)
+
 
 class TestCaseWrest(unittest.TestCase):
 
@@ -36,7 +39,7 @@ class TestCaseWrest(unittest.TestCase):
         cls.server = make_server(HOST, PORT, fixture_app)
         cls.server_proc = Process(target=cls.server.serve_forever)
         cls.server_proc.start()
-        time.sleep(1) # Let server start in parallel execution
+        time.sleep(1)  # Let server start in parallel execution
 
     @classmethod
     def tearDownClass(cls):
@@ -79,8 +82,8 @@ class TestCaseWrest(unittest.TestCase):
     def test_body(self):
         client = Hammock(BASE_URL)
         body = "body fixture"
-        resp = client.POST('sample', 'path', 'to', 'resource',
-                            data=body, headers={'Content-Length': str(len(body))})
+        resp = client.POST('sample', 'path', 'to', 'resource', data=body,
+                           headers={'Content-Length': str(len(body))})
         self.assertIsNotNone(resp.json)
         self.assertIsNotNone(resp.json.get('body', None))
         self.assertEqual(resp.json.get('body'), body)
@@ -88,7 +91,7 @@ class TestCaseWrest(unittest.TestCase):
     def test_query(self):
         client = Hammock(BASE_URL)
         resp = client.POST('sample', 'path', 'to', 'resource',
-                                                        params={'foo': 'bar'})
+                           params={'foo': 'bar'})
         self.assertIsNotNone(resp.json)
         self.assertIsNotNone(resp.json.get('querystring', None))
         self.assertEqual(resp.json.get('querystring'), 'foo=bar')
@@ -96,7 +99,7 @@ class TestCaseWrest(unittest.TestCase):
     def test_headers(self):
         client = Hammock(BASE_URL)
         resp = client.POST('sample', 'path', 'to', 'resource',
-                                                        headers={'foo': 'bar'})
+                           headers={'foo': 'bar'})
         self.assertIsNotNone(resp.json)
         headers = resp.json.get('headers', None)
         self.assertIsNotNone(headers)

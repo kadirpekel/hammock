@@ -1,5 +1,5 @@
 from setuptools import setup
- 
+
 setup(
     name='hammock',
     py_modules=['hammock'],
