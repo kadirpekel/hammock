@@ -1,8 +1,14 @@
-Hammock!
-========
+::
+
+     _                                   _     
+    | |                                 | |    
+    | |__  _____ ____  ____   ___   ____| |  _ 
+    |  _ \(____ |    \|    \ / _ \ / ___) |_/ )
+    | | | / ___ | | | | | | | |_| ( (___|  _ ( 
+    |_| |_\_____|_|_|_|_|_|_|\___/ \____)_| \_)
 
 Hammock is a fun module lets you deal with rest APIs by converting them into dead simple programmatic APIs.
-It uses popular `requests` module in backyard to provide full-fledged rest experience.
+It uses popular ``requests`` module in backyard to provide full-fledged rest experience.
 
 Proof
 -----
@@ -11,11 +17,11 @@ Let's play with github::
 
     >>> from hammock import Hammock as Github
 
-    >>> # This generates a url such as below and requests it via http GET
-    >>> resp = Github('https://api.github.com').repos('kadirpekel', 'hammock').watchers.GET()
+    >>> # Let's create the first chain of hammock using base api url
+    >>> github = Github('https://api.github.com')
 
-    >>> print(resp.url)
-    https://api.github.com/repos/kadirpekel/hammock/watchers
+    >>> # Ok, let the magic happens, ask github for hammock watchers
+    >>> resp = github.repos('kadirpekel', 'hammock').watchers.GET()
 
     >>> # now you're ready to take a rest for the rest the of code :)
     >>> for watcher in resp.json: print watcher.get('login')
@@ -24,30 +30,52 @@ Let's play with github::
     ..
     .
 
-Not convinced? This is how you watch this project to see its future capabilities::
+Not convinced? This is also how you can watch this project to see its future capabilities::
 
-    >>> from hammock import Hammock as Github
 
-    >>> resp = Github('https://api.github.com').user.watched('kadirpekel').PUT('hammock',
-                                    auth=('<user>', '<pass>'), headers={'content-length': '0'})
-
-    >>> print(resp)
+    >>> github.user.watched('kadirpekel', 'hammock').PUT(auth=('<user>', '<pass>'),
+                                                        headers={'content-length': '0'})
     <Response [204]>
+
+How?
+----
+
+``Hammock`` is a thin wrapper over ``requests`` module, you are still with it. But it simplifies your life
+by letting you place your variables into URLs naturally by using object notation way. Also you can wrap some
+url fragments into objects for improving code re-use. For example;
+
+
+Take these;
+
+    >>> base_url = 'https://api.github.com'
+    >>> user = 'kadirpekel'
+    >>> repo = 'hammock'
+
+Without ``Hammock``, using pure ``requests`` module you have to generate your urls by hand using string formatting::
+
+    >>> requests.get("%s/repos/%s/%s/watchers" % (base_url, user, repo))
+
+With ``Hammock``, you don't have to deal with string formatting. You can wrap ``base_url`` for code reuse
+and easily map variables to urls. This is just cleaner::
+
+    >>> github = hammock.Hammock(base_url)
+    >>> github.repos(user, repo).watchers.GET()
+    >>> github.user.watched('kadirpekel', 'hammock').PUT()  # reuse!
 
 Install
 -------
 
-The best way to install Hammock is using pypi repositories via `easy_install` or `pip`::
+The best way to install ``Hammock`` is using pypi repositories via ``easy_install`` or ``pip``::
 
     $ pip install hammock
 
 Documentation
 -------------
 
-Hammock is a magical, polymorphic(!), fun and simple class which helps you generate RESTful urls
-and lets you request them using `requests` module in an easy and slick way.
+``Hammock`` is a magical, polymorphic(!), fun and simple class which helps you generate RESTful urls
+and lets you request them using ``requests`` module in an easy and slick way.
 
-Below the all phrases make request to the same url of 'http://localhost:8000/users/foo/posts/bar/comments'.
+Below the all phrases make requests to the same url of 'http://localhost:8000/users/foo/posts/bar/comments'.
 Note that all of them are valid but some of them are nonsense in their belonging context::
 
     >>> import hammock
@@ -64,14 +92,14 @@ Note that all of them are valid but some of them are nonsense in their belonging
     <Response [200]>
     >>> # Any other combinations ...
 
-Hammock class instance provides `requests` module's all http methods binded on itself as uppercased version
-while dropping the first arg 'url' in replacement of `*args` to let you to continue appending url components.
+``Hammock`` class instance provides `requests` module's all http methods binded on itself as uppercased version
+while dropping the first arg ``url`` in replacement of ``*args`` to let you to continue appending url components.
 
-Also you can continue providing any keyword argument for corresponding http verb method of `requests` module::
+Also you can continue providing any keyword argument for corresponding http verb method of ``requests`` module::
 
     Hammock.[GET, HEAD, OPTIONS, POST, PUT, PATCH, DELETE](*args, **kwargs)
 
-Return type is the same `Response` object `requests` module provides.
+Return type is the same ``Response`` object ``requests`` module provides.
 
 Here is some more real world applicable example which uses twitter api::
 
@@ -104,7 +132,13 @@ auth credentials through several http requests::
 
     >>> print(watched)
 
-More detailed, concrete documentation coming soon...
+Also keep in mind that if you want a trailing slash at the end of  URLs generated by ``Hammock``
+you should pass ``append_slash`` kewyword argument as ``True`` while constructing ``Hammock``.
+For example::
+
+    >>> api = hammock.Hammock('http://localhost:8000', append_slash=True)
+    >>> print (api.foo.bar)  # Note that trailing slash
+    'http://localhost:8000/foo/bar/'
 
 Contributors
 ------------
