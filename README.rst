@@ -60,7 +60,7 @@ and easily map variables to urls. This is just cleaner::
 
     >>> github = hammock.Hammock(base_url)
     >>> github.repos(user, repo).watchers.GET()
-    >>> github.user.watched('kadirpekel', 'hammock').PUT()  # reuse!
+    >>> github.user.watched(user, repo).PUT()  # reuse!
 
 Install
 -------
