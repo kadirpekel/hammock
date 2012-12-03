@@ -68,6 +68,7 @@ class TestCaseWrest(unittest.TestCase):
         HTTPretty.register_uri(HTTPretty.GET, self.URL)
         client = CustomHammock(self.BASE_URL, testing=True)
         resp = client.sample.path.to.resource.GET()
+        self.assertTrue(called)
         self.assertEqual(HTTPretty.last_request.path, self.PATH)
 
 
