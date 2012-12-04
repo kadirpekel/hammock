@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Hammock by kadirpekel</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Hammock</h1>
+        <p>rest like a boss</p>
+        <p class="view"><a href="https://github.com/kadirpekel/hammock">View the Project on GitHub <small>kadirpekel/hammock</small></a></p>
+        <ul>
+          <li><a href="https://github.com/kadirpekel/hammock/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/kadirpekel/hammock/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/kadirpekel/hammock">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>Hammock is a fun module lets you deal with rest APIs by converting them into dead simple programmatic APIs.
+It uses popular <code>requests</code> module in backyard to provide full-fledged rest experience.</p>
+
+<h2>Proof</h2>
+
+<p>Let's play with github::</p>
+
+<pre><code>&gt;&gt;&gt; from hammock import Hammock as Github
+
+&gt;&gt;&gt; # Let's create the first chain of hammock using base api url
+&gt;&gt;&gt; github = Github('https://api.github.com')
+
+&gt;&gt;&gt; # Ok, let the magic happens, ask github for hammock watchers
+&gt;&gt;&gt; resp = github.repos('kadirpekel', 'hammock').watchers.GET()
+
+&gt;&gt;&gt; # now you're ready to take a rest for the rest the of code :)
+&gt;&gt;&gt; for watcher in resp.json: print watcher.get('login')
+kadirpekel
+...
+..
+.
+</code></pre>
+
+<p>Not convinced? This is also how you can watch this project to see its future capabilities::</p>
+
+<pre><code>&gt;&gt;&gt; github.user.watched('kadirpekel', 'hammock').PUT(auth=('&lt;user&gt;', '&lt;pass&gt;'),
+                                                    headers={'content-length': '0'})
+&lt;Response [204]&gt;
+</code></pre>
+
+<h2>How?</h2>
+
+<p><code>Hammock</code> is a thin wrapper over <code>requests</code> module, you are still with it. But it simplifies your life
+by letting you place your variables into URLs naturally by using object notation way. Also you can wrap some
+url fragments into objects for improving code re-use. For example;</p>
+
+<p>Take these;</p>
+
+<pre><code>&gt;&gt;&gt; base_url = 'https://api.github.com'
+&gt;&gt;&gt; user = 'kadirpekel'
+&gt;&gt;&gt; repo = 'hammock'
+</code></pre>
+
+<p>Without <code>Hammock</code>, using pure <code>requests</code> module you have to generate your urls by hand using string formatting::</p>
+
+<pre><code>&gt;&gt;&gt; requests.get("%s/repos/%s/%s/watchers" % (base_url, user, repo))
+</code></pre>
+
+<p>With <code>Hammock</code>, you don't have to deal with string formatting. You can wrap <code>base_url</code> for code reuse
+and easily map variables to urls. This is just cleaner::</p>
+
+<pre><code>&gt;&gt;&gt; github = hammock.Hammock(base_url)
+&gt;&gt;&gt; github.repos(user, repo).watchers.GET()
+&gt;&gt;&gt; github.user.watched(user, repo).PUT()  # reuse!
+</code></pre>
+
+<h2>Install</h2>
+
+<p>The best way to install <code>Hammock</code> is using pypi repositories via <code>easy_install</code> or <code>pip</code>::</p>
+
+<pre><code>$ pip install hammock
+</code></pre>
+
+<h2>Documentation</h2>
+
+<p><code>Hammock</code> is a magical, polymorphic(!), fun and simple class which helps you generate RESTful urls
+and lets you request them using <code>requests</code> module in an easy and slick way.</p>
+
+<p>Below the all phrases make requests to the same url of 'http://localhost:8000/users/foo/posts/bar/comments'.
+Note that all of them are valid but some of them are nonsense in their belonging context::</p>
+
+<pre><code>&gt;&gt;&gt; import hammock
+&gt;&gt;&gt; api = hammock.Hammock('http://localhost:8000')
+&gt;&gt;&gt; api.users('foo').posts('bar').comments.GET()
+&lt;Response [200]&gt;
+&gt;&gt;&gt; api.users.foo.posts('bar').GET('comments')
+&lt;Response [200]&gt;
+&gt;&gt;&gt; api.users.foo.posts.bar.comments.GET()
+&lt;Response [200]&gt;
+&gt;&gt;&gt; api.users('foo', 'posts', 'comments').GET()
+&lt;Response [200]&gt;
+&gt;&gt;&gt; api('users')('foo', 'posts').GET('bar', 'comments')
+&lt;Response [200]&gt;
+&gt;&gt;&gt; # Any other combinations ...
+</code></pre>
+
+<p><code>Hammock</code> class instance provides <code>requests</code> module's all http methods binded on itself as uppercased version
+while dropping the first arg <code>url</code> in replacement of <code>*args</code> to let you to continue appending url components.</p>
+
+<p>Also you can continue providing any keyword argument for corresponding http verb method of <code>requests</code> module::</p>
+
+<pre><code>Hammock.[GET, HEAD, OPTIONS, POST, PUT, PATCH, DELETE](*args, **kwargs)
+</code></pre>
+
+<p>Return type is the same <code>Response</code> object <code>requests</code> module provides.</p>
+
+<p>Here is some more real world applicable example which uses twitter api::</p>
+
+<pre><code>&gt;&gt;&gt; import hammock
+&gt;&gt;&gt; twitter = hammock.Hammock('https://api.twitter.com/1')
+&gt;&gt;&gt; tweets = twitter.statuses('user_timeline.json').GET(params={'screen_name':'kadirpekel', 'count':'10'}).json
+&gt;&gt;&gt; for tweet in tweets: print tweet.get('text')
+my tweets
+...
+..
+.
+</code></pre>
+
+<p>You might also want to use sessions. Let's take a look at the JIRA example below which maintains basic
+auth credentials through several http requests::</p>
+
+<pre><code>&gt;&gt;&gt; import hammock
+
+&gt;&gt;&gt; # You can configure a session by providing keyword args to `Hammock` constructor to initiate builtin `requests` session
+&gt;&gt;&gt; # This sample below shows the use of auth credentials through several requests by intitiating a embedded session
+&gt;&gt;&gt; jira = hammock.Hammock('https://jira.atlassian.com/rest/api/latest', auth=('&lt;user&gt;', '&lt;pass&gt;'))
+
+&gt;&gt;&gt; my_issue = 'JRA-9'
+
+&gt;&gt;&gt; # Let's get a jira issue. No auth credentials provided explicitly since parent
+&gt;&gt;&gt; # hammock already has a `requests` session configured.
+&gt;&gt;&gt; issue = jira.issue(my_issue).GET()
+
+&gt;&gt;&gt; # Now watch the issue again using with the same session
+&gt;&gt;&gt; watched = jira.issue(my_issue).watchers.POST(params={'name': '&lt;user&gt;'})
+
+&gt;&gt;&gt; print(watched)
+</code></pre>
+
+<p>Also keep in mind that if you want a trailing slash at the end of  URLs generated by <code>Hammock</code>
+you should pass <code>append_slash</code> kewyword argument as <code>True</code> while constructing <code>Hammock</code>.
+For example::</p>
+
+<pre><code>&gt;&gt;&gt; api = hammock.Hammock('http://localhost:8000', append_slash=True)
+&gt;&gt;&gt; print (api.foo.bar)  # Note that trailing slash
+'http://localhost:8000/foo/bar/'
+</code></pre>
+
+<h2>Contributors</h2>
+
+<ul>
+<li>
+<a href="https://github.com/maraujop" class="user-mention">@maraujop</a> (Miguel Araujo)</li>
+<li>
+<a href="https://github.com/rubik" class="user-mention">@rubik</a> (Michele Lacchia)</li>
+</ul><h2>Licence</h2>
+
+<p>Copyright (c) 2012 Kadir Pekel.</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/kadirpekel">kadirpekel</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
