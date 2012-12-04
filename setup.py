@@ -8,6 +8,7 @@ setup(
     author='Kadir Pekel',
     author_email='kadirpekel@gmail.com',
     url='https://github.com/kadirpekel/hammock',
+    long_description=open('README.rst').read(),
     install_requires=[
         'requests>=0.13.6'
     ],
