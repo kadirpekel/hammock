@@ -19,7 +19,13 @@ class Hammock(object):
         self._name = name
         self._parent = parent
         self._append_slash = append_slash
-        self._session = kwargs and requests.session(**kwargs) or requests
+        self._session = requests.session()
+        for k, v in kwargs.items():
+            orig = getattr(self._session, k)  # Let it throw exception
+            if isinstance(orig, dict):
+                orig.update(v)
+            else:
+                setattr(self._session, k, v)
 
     def _spawn(self, name):
         """Returns a shallow copy of current `Hammock` instance as nested child
